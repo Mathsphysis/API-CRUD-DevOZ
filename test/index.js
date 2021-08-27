@@ -117,25 +117,38 @@ describe('Testes da aplicaçao',  () => {
         });
     });
 
-    it('o usuario naoExiste não existe no sistema', function (done) {
-        chai.request(app)
-        .get('/user/naoExiste')
-        .end(function (err, res) {
-            expect(err.response.body.error).to.be.equal('User not found'); //possivelmente forma errada de verificar a mensagem de erro
-            expect(res).to.have.status(404);
-            expect(res.body).to.be.jsonSchema(userSchema);
-            done();
+    describe('Teste de leitura do repositório de usuários', () => {
+        it('o usuario naoExiste não existe no sistema', function (done) {
+            chai.request(app)
+            .get('/user/naoExiste')
+            .end(function (err, res) {
+                expect(err.response.body.error).to.be.equal('User not found'); //possivelmente forma errada de verificar a mensagem de erro
+                expect(res).to.have.status(404);
+                expect(res.body).to.be.jsonSchema(userSchema);
+                done();
+            });
         });
-    });
+    
+        it('o usuario raupp existe e é valido', function (done) {
+            chai.request(app)
+            .get('/user/raupp')
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.jsonSchema(userSchema);
+                done();
+            });
+        });
 
-    it('o usuario raupp existe e é valido', function (done) {
-        chai.request(app)
-        .get('/user/raupp')
-        .end(function (err, res) {
+        it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
+            chai.request(app)
+            .get('/users')
+            .end(function (err, res) {
             expect(err).to.be.null;
             expect(res).to.have.status(200);
-            expect(res.body).to.be.jsonSchema(userSchema);
+            expect(res.body.total).to.be.at.least(5);
             done();
+            });
         });
     });
 
@@ -161,14 +174,5 @@ describe('Testes da aplicaçao',  () => {
         });
     });
 
-    it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
-        chai.request(app)
-        .get('/users')
-        .end(function (err, res) {
-        expect(err).to.be.null;
-        expect(res).to.have.status(200);
-        expect(res.body.total).to.be.at.least(5);
-        done();
-        });
-    });
+    
 })
