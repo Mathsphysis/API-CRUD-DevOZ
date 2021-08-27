@@ -10,10 +10,10 @@
 
 const app =  require('../src/index.js');
 
-const assert = require('assert');
 const chai = require('chai')
 const chaiHttp = require('chai-http');
 const chaiJson = require('chai-json-schema');
+const server = require('../src/index.js');
 
 chai.use(chaiHttp);
 chai.use(chaiJson);
@@ -43,6 +43,10 @@ const userSchema = {
 
 //testes da aplicação
 describe('Testes da aplicaçao',  () => {
+
+    after('cleanup', () => {
+        server.close();
+    });
     it('o servidor esta online', function (done) {
         chai.request(app)
         .get('/')
@@ -67,7 +71,7 @@ describe('Testes da aplicaçao',  () => {
     describe('Testes de criação de usuário', () => {
         it('deveria criar o usuario raupp', function (done) {
             chai.request(app)
-            .post('/user')
+            .post('/users')
             .send({nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35})
             .end(function (err, res) {
                 expect(err).to.be.null;
@@ -106,7 +110,7 @@ describe('Testes da aplicaçao',  () => {
             ];
             users.forEach((user) => {
                 chai.request(app)
-                .post('/user')
+                .post('/users')
                 .send({ ...user })
                 .end( (err, res) => {
                     expect(err).to.be.null;
@@ -117,10 +121,10 @@ describe('Testes da aplicaçao',  () => {
         });
     });
 
-    describe('Teste de leitura do repositório de usuários', () => {
+    describe('Testes de leitura do repositório de usuários', () => {
         it('o usuario naoExiste não existe no sistema', function (done) {
             chai.request(app)
-            .get('/user/naoExiste')
+            .get('/users/naoExiste')
             .end(function (err, res) {
                 expect(err.response.body.error).to.be.equal('User not found'); //possivelmente forma errada de verificar a mensagem de erro
                 expect(res).to.have.status(404);
@@ -131,7 +135,7 @@ describe('Testes da aplicaçao',  () => {
     
         it('o usuario raupp existe e é valido', function (done) {
             chai.request(app)
-            .get('/user/raupp')
+            .get('/users/raupp')
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
@@ -157,7 +161,7 @@ describe('Testes da aplicaçao',  () => {
         it('atualiza todos os campos do usuário', (done) => {
             const userToUpdate = { nome:"fernando", email:"fernando@devoz.com.br", idade:31 };
             chai.request(app)
-            .put(`/users/${userToUpdate[nome]}`)
+            .put(`/users/${userToUpdate['nome']}`)
             .send(userToUpdate)
             .end( (err, res) => {
                 expect(err).to.be.null;
@@ -169,7 +173,7 @@ describe('Testes da aplicaçao',  () => {
             const nome = "fernando";
             const fieldPatch = {op: "replace", path: `/idade`, value: "45"};
             chai.request(app)
-            .patch(`/users/${userToUpdate[nome]}`)
+            .patch(`/users/${nome}`)
             .send(fieldPatch)
             .end( (err, res) => {
                 expect(err).to.be.null;
@@ -177,11 +181,11 @@ describe('Testes da aplicaçao',  () => {
             });
             done();
         });
-        it('atualiza o campo idade do usuário', (done) => {
+        it('atualiza o campo email do usuário', (done) => {
             const nome = "fernando";
             const fieldPatch = {op: "replace", path: `/email`, value: "fernando@mail.com"};
             chai.request(app)
-            .patch(`/users/${userToUpdate[nome]}`)
+            .patch(`/users/${nome}`)
             .send(fieldPatch)
             .end( (err, res) => {
                 expect(err).to.be.null;
@@ -191,27 +195,28 @@ describe('Testes da aplicaçao',  () => {
         });
     });
 
-    it('deveria excluir o usuario raupp', function (done) {
-        chai.request(app)
-        .delete('/user/raupp')
-        .end(function (err, res) {
-            expect(err).to.be.null;
-            expect(res).to.have.status(200);
-            expect(res.body).to.be.jsonSchema(userSchema);
-            done();
+    describe('Testes de exclusão de usuários do repositório', () => {
+        it('deveria excluir o usuario raupp', function (done) {
+            chai.request(app)
+            .delete('/users/raupp')
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.jsonSchema(userSchema);
+                done();
+            });
+        });
+    
+        it('o usuario raupp não deve existir mais no sistema', function (done) {
+            chai.request(app)
+            .get('/users/raupp')
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.jsonSchema(userSchema);
+                done();
+            });
         });
     });
-
-    it('o usuario raupp não deve existir mais no sistema', function (done) {
-        chai.request(app)
-        .get('/user/raupp')
-        .end(function (err, res) {
-            expect(err).to.be.null;
-            expect(res).to.have.status(200);
-            expect(res.body).to.be.jsonSchema(userSchema);
-            done();
-        });
-    });
-
     
 })
