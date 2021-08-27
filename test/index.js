@@ -126,9 +126,8 @@ describe('Testes da aplicaçao',  () => {
             chai.request(app)
             .get('/users/naoExiste')
             .end(function (err, res) {
-                expect(err.response.body.error).to.be.equal('User not found'); //possivelmente forma errada de verificar a mensagem de erro
+                expect(res.error.text).to.be.equal('User not found'); //possivelmente forma errada de verificar a mensagem de erro
                 expect(res).to.have.status(404);
-                expect(res.body).to.be.jsonSchema(userSchema);
                 done();
             });
         });
@@ -139,7 +138,7 @@ describe('Testes da aplicaçao',  () => {
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
-                expect(res.body).to.be.jsonSchema(userSchema);
+                expect(res.body[0]).to.be.jsonSchema(userSchema);
                 done();
             });
         });
@@ -171,7 +170,7 @@ describe('Testes da aplicaçao',  () => {
         });
         it('atualiza o campo idade do usuário', (done) => {
             const nome = "fernando";
-            const fieldPatch = {op: "replace", path: `/idade`, value: "45"};
+            const fieldPatch = {op: "replace", path: `/idade`, value: 45};
             chai.request(app)
             .patch(`/users/${nome}`)
             .send(fieldPatch)
@@ -201,8 +200,7 @@ describe('Testes da aplicaçao',  () => {
             .delete('/users/raupp')
             .end(function (err, res) {
                 expect(err).to.be.null;
-                expect(res).to.have.status(200);
-                expect(res.body).to.be.jsonSchema(userSchema);
+                expect(res).to.have.status(204);
                 done();
             });
         });
@@ -212,8 +210,7 @@ describe('Testes da aplicaçao',  () => {
             .get('/users/raupp')
             .end(function (err, res) {
                 expect(err).to.be.null;
-                expect(res).to.have.status(200);
-                expect(res.body).to.be.jsonSchema(userSchema);
+                expect(res).to.have.status(404);
                 done();
             });
         });
