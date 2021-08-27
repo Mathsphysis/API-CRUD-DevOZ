@@ -41,13 +41,6 @@ const userSchema = {
 
 //Inicio dos testes
 
-//este teste é simplesmente pra enteder a usar o mocha/chai
-describe('Um simples conjunto de testes', function () {
-    it('deveria retornar -1 quando o valor não esta presente', function () {
-        assert.equal([1, 2, 3].indexOf(4), -1);
-    });
-});
-
 //testes da aplicação
 describe('Testes da aplicaçao',  () => {
     it('o servidor esta online', function (done) {
@@ -71,17 +64,58 @@ describe('Testes da aplicaçao',  () => {
         });
     });
 
-    it('deveria criar o usuario raupp', function (done) {
-        chai.request(app)
-        .post('/user')
-        .send({nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35})
-        .end(function (err, res) {
-            expect(err).to.be.null;
-            expect(res).to.have.status(201);
+    describe('Testes de criação de usuário', () => {
+        it('deveria criar o usuario raupp', function (done) {
+            chai.request(app)
+            .post('/user')
+            .send({nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35})
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(201);
+                done();
+            });
+        });
+        
+        it('cria usuários predefinidos', function (done) {
+            const users = [
+                {
+                    nome: "marcela",
+                    email: "marcela@email.com",
+                    idade: 28
+                },
+                {
+                    nome: "fernando",
+                    email: "fernando@gmail.com",
+                    idade: 30
+                }, 
+                {
+                    nome: "ricardo",
+                    email: "ricardo@email.com",
+                    idade: 19
+                },
+                {
+                    nome: "gabriela",
+                    email: "gabriela@gmail.com",
+                    idade: 23
+                },
+                {
+                    nome: "isabela",
+                    email: "isabela@email.com",
+                    idade: 25
+                }
+            ];
+            users.forEach((user) => {
+                chai.request(app)
+                .post('/user')
+                .send({ ...user })
+                .end( (err, res) => {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(201);
+                });
+            });
             done();
         });
     });
-    //...adicionar pelo menos mais 5 usuarios. se adicionar usuario menor de idade, deve dar erro. Ps: não criar o usuario naoExiste
 
     it('o usuario naoExiste não existe no sistema', function (done) {
         chai.request(app)
@@ -127,7 +161,7 @@ describe('Testes da aplicaçao',  () => {
         });
     });
 
-    it('deveria ser uma lista com pelomenos 5 usuarios', function (done) {
+    it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
         chai.request(app)
         .get('/users')
         .end(function (err, res) {
