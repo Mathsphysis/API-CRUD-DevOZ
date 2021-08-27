@@ -152,6 +152,45 @@ describe('Testes da aplicaçao',  () => {
         });
     });
 
+
+    describe('Testes de atualização do repositório de usuários', () => {
+        it('atualiza todos os campos do usuário', (done) => {
+            const userToUpdate = { nome:"fernando", email:"fernando@devoz.com.br", idade:31 };
+            chai.request(app)
+            .put(`/users/${userToUpdate[nome]}`)
+            .send(userToUpdate)
+            .end( (err, res) => {
+                expect(err).to.be.null;
+                expect(res).to.have.status(204)
+            });
+            done();
+        });
+        it('atualiza o campo idade do usuário', (done) => {
+            const nome = "fernando";
+            const fieldPatch = {op: "replace", path: `/idade`, value: "45"};
+            chai.request(app)
+            .patch(`/users/${userToUpdate[nome]}`)
+            .send(fieldPatch)
+            .end( (err, res) => {
+                expect(err).to.be.null;
+                expect(res).to.have.status(204)
+            });
+            done();
+        });
+        it('atualiza o campo idade do usuário', (done) => {
+            const nome = "fernando";
+            const fieldPatch = {op: "replace", path: `/email`, value: "fernando@mail.com"};
+            chai.request(app)
+            .patch(`/users/${userToUpdate[nome]}`)
+            .send(fieldPatch)
+            .end( (err, res) => {
+                expect(err).to.be.null;
+                expect(res).to.have.status(204)
+            });
+            done();
+        });
+    });
+
     it('deveria excluir o usuario raupp', function (done) {
         chai.request(app)
         .delete('/user/raupp')
