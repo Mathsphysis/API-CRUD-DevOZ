@@ -2,6 +2,9 @@ const Router = require("koa-router");
 
 const UserService = require('./service');
 
+const userRepository = require('./repository');
+const userService = new UserService(userRepository);
+
 let router = new Router({
     prefix: '/api/v1'
 });
@@ -13,7 +16,7 @@ router.get("/", async (ctx) => {
 
 router.get("/users", async (ctx) => {
   try {
-    const users = await UserService.findAll(ctx);
+    const users = await userService.findAll(ctx);
     ctx.status = 200;
     ctx.body = { total: users.length, count: 0, rows: users };
   } catch (err) {
@@ -24,7 +27,7 @@ router.get("/users", async (ctx) => {
 router.get("/users/:id", async (ctx) => {
   const { id } = ctx.params;
     try {
-        const user = await UserService.findOneByID(id);
+        const user = await userService.findOneByID(id);
         ctx.response.status = 200;
         ctx.body = user;
     } catch (err) {
@@ -35,7 +38,7 @@ router.get("/users/:id", async (ctx) => {
 router.post("/users", async (ctx) => {
   const userToSave = { ...ctx.request.body };
   try {
-    const user = await UserService.save(userToSave);
+    const user = await userService.save(userToSave);
     ctx.response.status = 201;
     ctx.body = user;
   } catch (err) {
@@ -47,7 +50,7 @@ router.put("/users/:id", async (ctx) => {
   const userToUpdate = { ...ctx.request.body };
   const { id } = ctx.params;
   try {
-    await UserService.update(id, userToUpdate);
+    await userService.update(id, userToUpdate);
   } catch (err) {
     ctx.throw(404, err.message);
   }
@@ -72,7 +75,7 @@ router.patch("/users/:id", async (ctx) => {
 router.delete("/users/:id", async (ctx) => {
   const { id } = ctx.params;
   try {
-    await UserService.delete(id);
+    await userService.deleteByID(id);
     ctx.response.status = 204;
   } catch (err) {
     ctx.throw(404, err.message);
@@ -81,7 +84,7 @@ router.delete("/users/:id", async (ctx) => {
 
 const acceptedOps = {
   async replace(id, field, value) {
-    await UserService.replaceField(id,field,value);
+    await userService.replaceField(id,field,value);
   }
 }
 

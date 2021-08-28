@@ -1,49 +1,62 @@
-const UserRepository = require("./repository");
+function UserService(userRepository) {
 
-module.exports.findAll = async function () {
+ async function findAll () {
     try{
-        return await UserRepository.findAll();
+        return await userRepository.findAll();
     } catch (err) {
         throw new Error(err.message);
     }
 };
 
-module.exports.findOneByID = async function (id) {
+ async function findOneByID(id) {
   try {
-      return await UserRepository.findOneByID(id);
+      return await userRepository.findOneByID(id);
   } catch (err) {
       throw new Error(err.message);
   }
 };
 
-module.exports.save = async function (userToSave) {
+ async function save (userToSave) {
     try {
-        return await UserRepository.save(userToSave);
+        return await userRepository.save(userToSave);
     } catch (err) {
         throw new Error(err.message);
     }
 }
 
-module.exports.delete = async function (id) {
+  async function deleteByID(id) {
     try {
-        return await UserRepository.delete(id);
+        return await userRepository.delete(id);
     } catch (err) {
         throw new Error(err.message);
     }
 }
 
-module.exports.update = async function (id, userToUpdate) {
+ async function update(id, userToUpdate) {
     try {
-        return await UserRepository.update(id, userToUpdate);
+        return await userRepository.update(id, userToUpdate);
     } catch (err) {
         throw new Error(err.message);
     }
 }
 
-module.exports.replaceField = async function (id, field, value) {
+ async function replaceField(id, field, value) {
     try {
-        return await UserRepository.replaceField(id, field, value);
+        return await userRepository.replaceField(id, field, value);
     } catch (err) {
         throw new ErrorEvent(err.message);
     }
 }
+
+return {
+    save,
+    findAll,
+    findOneByID,
+    deleteByID,
+    update,
+    replaceField
+};
+
+}
+
+module.exports = UserService;

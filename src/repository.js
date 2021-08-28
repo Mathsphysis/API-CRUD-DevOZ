@@ -4,7 +4,7 @@ module.exports.findAll = async function () {
     return usersDB;
 }
 
-module.exports.findOneByID = async function findOneByID(id) {
+module.exports.findOneByID = async function (id) {
     const foundUser = usersDB.filter((user) => user.nome === id);
     if(foundUser.length === 0){
         throw new Error('User not found');
