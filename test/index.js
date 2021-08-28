@@ -124,6 +124,16 @@ describe('Testes da aplicaçao',  () => {
     });
 
     describe('Testes de leitura do repositório de usuários', () => {
+        it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
+            chai.request(app)
+            .get(`${BASE_URL}/users`)
+            .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            expect(res.body.total).to.be.at.least(5);
+            done();
+            });
+        });
         it('o usuario naoExiste não existe no sistema', function (done) {
             chai.request(app)
             .get(`${BASE_URL}/users/naoExiste`)
@@ -140,21 +150,12 @@ describe('Testes da aplicaçao',  () => {
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
-                expect(res.body[0]).to.be.jsonSchema(userSchema);
+                expect(res.body).to.be.jsonSchema(userSchema);
                 done();
             });
         });
 
-        it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
-            chai.request(app)
-            .get(`${BASE_URL}/users`)
-            .end(function (err, res) {
-            expect(err).to.be.null;
-            expect(res).to.have.status(200);
-            expect(res.body.total).to.be.at.least(5);
-            done();
-            });
-        });
+        
     });
 
 

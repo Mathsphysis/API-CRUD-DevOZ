@@ -6,39 +6,51 @@ let router = new Router({
     prefix: '/api/v1'
 });
 
-
-
 //rota simples pra testar se o servidor está online
 router.get("/", async (ctx) => {
   ctx.body = `O servidor está rodando!`;
 });
 
 router.get("/users", async (ctx) => {
-  return UserService.findAll(ctx);
+  try {
+    const users = await UserService.findAll(ctx);
+    ctx.status = 200;
+    ctx.body = { total: users.length, count: 0, rows: users };
+  } catch (err) {
+    ctx.throw(500);
+  }
 });
 
 router.get("/users/:id", async (ctx) => {
   const { id } = ctx.params;
-  const user = usersDB.filter((user) => user.nome === id);
-
-  if (user.length === 0) {
-    ctx.throw(404, "User not found");
-  }
-
-  ctx.response.status = 200;
-  ctx.body = user;
+    try {
+        const user = await UserService.findOneByID(id);
+        ctx.response.status = 200;
+        ctx.body = user;
+    } catch (err) {
+        ctx.throw(404, err.message);
+    }
 });
 
 router.post("/users", async (ctx) => {
-  const user = { ...ctx.request.body };
-  usersDB.push(user);
-  ctx.response.status = 201;
-  ctx.body = user;
+  const userToSave = { ...ctx.request.body };
+  try {
+    const user = await UserService.save(userToSave);
+    ctx.response.status = 201;
+    ctx.body = user;
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
 });
 
 router.put("/users/:id", async (ctx) => {
   const userToUpdate = { ...ctx.request.body };
-  usersDB[0] = userToUpdate;
+  const { id } = ctx.params;
+  try {
+    await UserService.update(id, userToUpdate);
+  } catch (err) {
+    ctx.throw(404, err.message);
+  }
   ctx.response.status = 204;
 });
 
@@ -46,18 +58,31 @@ router.patch("/users/:id", async (ctx) => {
   const { op, path, value } = ctx.request.body;
   const { id } = ctx.params;
   const field = path.substring(1);
-  usersDB
-    .filter((user) => user.nome === id)
-    .forEach((userToUpdate) => {
-      userToUpdate[field] = value;
-    });
-  ctx.response.status = 204;
+  const requestedOp = acceptedOps[op];
+  if(requestedOp !== undefined){
+    try {
+      await requestedOp(id, field, value);
+      ctx.response.status = 204;
+    } catch (err) {
+      ctx.throw(404, err.message);
+    }
+  }
 });
 
 router.delete("/users/:id", async (ctx) => {
   const { id } = ctx.params;
-  usersDB.splice(usersDB.indexOf(id), 1);
-  ctx.response.status = 204;
+  try {
+    await UserService.delete(id);
+    ctx.response.status = 204;
+  } catch (err) {
+    ctx.throw(404, err.message);
+  }
 });
+
+const acceptedOps = {
+  async replace(id, field, value) {
+    await UserService.replaceField(id,field,value);
+  }
+}
 
 module.exports = router;

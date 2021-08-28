@@ -19,8 +19,6 @@ koa.use(async (ctx, next) => {
   try{
     await next();
   } catch (err) {
-    ctx.status = err.status || 500;
-    ctx.body = err.message;
     ctx.app.emit('error', err, ctx);
   }
 });
@@ -32,8 +30,8 @@ koa
   .use(router.allowedMethods());
 
 koa.on('error', (err, ctx) => {
-  console.error(err);
-  console.error(ctx.res.error.text);
+  ctx.response.status = err.status || 500;
+  ctx.body = err.message;
 });
 
 const server = koa.listen(PORT);
