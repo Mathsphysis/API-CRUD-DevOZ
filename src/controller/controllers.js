@@ -1,7 +1,10 @@
 const Router = require("koa-router");
+const config = require('config');
 
-const UserService = require('./service');
-const UserRepository = require('./repository');
+const repoConfig = config.get('repository');
+
+const UserService = require('../service/service');
+const UserRepository = require(`../repository/${repoConfig.name}`);
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
@@ -51,7 +54,7 @@ router.put("/users/:id", async (ctx) => {
   const userToUpdate = { ...ctx.request.body };
   const { id } = ctx.params;
   try {
-    await userService.update(id, userToUpdate);
+    await userService.updateByID(id, userToUpdate);
   } catch (err) {
     ctx.throw(404, err.message);
   }

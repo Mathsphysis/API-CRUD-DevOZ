@@ -12,7 +12,7 @@ class IRepository {
         if(!this.deleteByID){
             throw new Error('Repository must have deleteByID method');
         }
-        if(!this.update){
+        if(!this.updateByID){
             throw new Error('Repository must have update method');
         }
         if(!this.replaceField){

@@ -11,7 +11,7 @@ const Koa = require('koa');
 
 const bodyParser = require('koa-bodyparser');
 
-const router = require('./controllers');
+const router = require('./controller/controllers');
 
 const koa = new Koa();
 

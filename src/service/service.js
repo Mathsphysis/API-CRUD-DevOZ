@@ -32,9 +32,9 @@ function UserService(userRepository) {
     }
 }
 
- async function update(id, userToUpdate) {
+ async function updateByID(id, userToUpdate) {
     try {
-        return await userRepository.update(id, userToUpdate);
+        return await userRepository.updateByID(id, userToUpdate);
     } catch (err) {
         throw new Error(err.message);
     }
@@ -44,7 +44,7 @@ function UserService(userRepository) {
     try {
         return await userRepository.replaceField(id, field, value);
     } catch (err) {
-        throw new ErrorEvent(err.message);
+        throw new Error(err.message);
     }
 }
 
@@ -53,7 +53,7 @@ return {
     findAll,
     findOneByID,
     deleteByID,
-    update,
+    updateByID,
     replaceField
 };
 

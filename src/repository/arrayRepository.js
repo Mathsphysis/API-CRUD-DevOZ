@@ -32,7 +32,7 @@ class ArrayRepository extends IRepository {
         }
       }
     
-      async update(id, userToUpdate) {
+      async updateByID(id, userToUpdate) {
         try {
           await this.findOneByID(id);
           const indexToUpdate = this.usersDB.map((user) => user.nome).indexOf(id);

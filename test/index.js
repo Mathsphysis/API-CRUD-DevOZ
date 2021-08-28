@@ -14,11 +14,16 @@ const chai = require('chai')
 const chaiHttp = require('chai-http');
 const chaiJson = require('chai-json-schema');
 const server = require('../src/index.js');
+const sequelize = require('../src/config/database');
 
 chai.use(chaiHttp);
 chai.use(chaiJson);
 
 const expect = chai.expect;
+
+before( async () => {
+    await sequelize.sync();
+});
 
 //Define o minimo de campos que o usuário deve ter. Geralmente deve ser colocado em um arquivo separado
 const userSchema = {
