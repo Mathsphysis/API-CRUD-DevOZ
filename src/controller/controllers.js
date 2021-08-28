@@ -31,7 +31,7 @@ router.get("/users", async (ctx) => {
 router.get("/users/:id", async (ctx) => {
   const { id } = ctx.params;
     try {
-        const user = await userService.findOneByID(id);
+        const user = await userService.findOneByName(id);
         ctx.response.status = 200;
         ctx.body = user;
     } catch (err) {
@@ -54,7 +54,7 @@ router.put("/users/:id", async (ctx) => {
   const userToUpdate = { ...ctx.request.body };
   const { id } = ctx.params;
   try {
-    await userService.updateByID(id, userToUpdate);
+    await userService.updateByName(id, userToUpdate);
   } catch (err) {
     ctx.throw(404, err.message);
   }
@@ -79,7 +79,7 @@ router.patch("/users/:id", async (ctx) => {
 router.delete("/users/:id", async (ctx) => {
   const { id } = ctx.params;
   try {
-    await userService.deleteByID(id);
+    await userService.deleteByName(id);
     ctx.response.status = 204;
   } catch (err) {
     ctx.throw(404, err.message);
@@ -87,8 +87,8 @@ router.delete("/users/:id", async (ctx) => {
 });
 
 const acceptedOps = {
-  async replace(id, field, value) {
-    await userService.replaceField(id,field,value);
+  async replace(name, field, value) {
+    await userService.replaceField(name,field,value);
   }
 }
 

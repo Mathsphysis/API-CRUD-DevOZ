@@ -1,3 +1,4 @@
+const UserNotFoundError = require('../exception/UserNotFoundError');
 const IRepository = require('./IRepository');
 const SQLModel = require('./sqlModel');
 
@@ -11,10 +12,10 @@ class SQLRepository extends IRepository {
         return await this.model.findAll();
     }
 
-    async findOneByID(id) {
-        const userFound = await this.model.findOne({ where:  {nome : id } });
+    async findOneByName(name) {
+        const userFound = await this.model.findOne({ where:  {nome : name } });
         if(!userFound){
-            throw new Error('User not found');
+            throw new UserNotFoundError('User not found error', `WHERE name='${name}'`);
         }
         return userFound;
     }
@@ -23,33 +24,31 @@ class SQLRepository extends IRepository {
         return await this.model.create({ ...userToSave });
     }
 
-    async deleteByID(id) {
-        const userToDestroy = await this.model.findOne({ where:  {nome : id } });
+    async deleteByName(name) {
+        const userToDestroy = await this.model.findOne({ where:  {nome : name } });
         if(userToDestroy) {
-            await userToDestroy.destroy({ where:  {nome : id } });
-            return "sucess";
+            return await userToDestroy.destroy({ where:  {nome : name } });
         }
-        throw new Error('User not found');
+        throw new UserNotFoundError('User not found error', `name: ${name}`)
     }
 
-    async updateByID(id, userToUpdate){
-        const userFound = await this.model.findOne({ where:  {nome : id } });
+    async updateByName(name, userToUpdate){
+        const userFound = await this.model.findOne({ where:  {nome : name } });
         if(userFound) {
-            await userFound.update(userToUpdate, { where:  {nome : id } });
-            return "sucess";
+            return await userFound.update(userToUpdate, { where:  {nome : name } });
         }
-        throw new Error('User not found');
+        throw new UserNotFoundError('User not found error', `name: ${name}`)
     }
 
-    async replaceField(id, field, value) {
-        const userFound = await this.model.findOne({ where:  {nome : id } });
+    async replaceField(name, field, value) {
+        const userFound = await this.model.findOne({ where:  {nome : name } });
         if(userFound) {
             let updateValues = {};
             updateValues[field] = value;
-            const userUpdated = await userFound.update({ where:  {nome : id } });
-            return "sucess";
+            return await userFound.update({ where:  {nome : name } });
+;
         }
-        throw new Error('User not found');
+        throw new UserNotFoundError('User not found error', `name: ${name}`)
     }
 }
 
