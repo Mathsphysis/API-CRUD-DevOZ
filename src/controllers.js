@@ -1,8 +1,9 @@
 const Router = require("koa-router");
 
 const UserService = require('./service');
+const UserRepository = require('./repository');
 
-const userRepository = require('./repository');
+const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 
 let router = new Router({

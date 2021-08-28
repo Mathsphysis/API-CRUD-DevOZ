@@ -26,7 +26,7 @@ function UserService(userRepository) {
 
   async function deleteByID(id) {
     try {
-        return await userRepository.delete(id);
+        return await userRepository.deleteByID(id);
     } catch (err) {
         throw new Error(err.message);
     }
