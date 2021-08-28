@@ -10,12 +10,11 @@ let router = new Router({
 
 //rota simples pra testar se o servidor está online
 router.get("/", async (ctx) => {
-  ctx.body = `Seu servidor esta rodando em http://localhost:${PORT}`; //http://localhost:3000/
+  ctx.body = `O servidor está rodando!`;
 });
 
 router.get("/users", async (ctx) => {
-  ctx.status = 200;
-  ctx.body = { total: usersDB.length, count: 0, rows: usersDB };
+  return UserService.findAll(ctx);
 });
 
 router.get("/users/:id", async (ctx) => {
