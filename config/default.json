@@ -1,0 +1,15 @@
+{
+    "database": {
+      "name": "user-crud-api",
+      "username": "my-db-user",
+      "password": "db-p4ss",
+      "options": {
+        "dialect": "sqlite",
+        "storage": ":memory:",
+        "logging": false
+      }
+    },
+    "repository": {
+      "name": "sqlRepository"
+    }
+  }

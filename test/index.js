@@ -14,11 +14,16 @@ const chai = require('chai')
 const chaiHttp = require('chai-http');
 const chaiJson = require('chai-json-schema');
 const server = require('../src/index.js');
+const sequelize = require('../src/config/database');
 
 chai.use(chaiHttp);
 chai.use(chaiJson);
 
 const expect = chai.expect;
+
+before( async () => {
+    await sequelize.sync();
+});
 
 //Define o minimo de campos que o usuário deve ter. Geralmente deve ser colocado em um arquivo separado
 const userSchema = {
@@ -39,6 +44,8 @@ const userSchema = {
     }
 }
 
+const BASE_URL = '/api/v1';
+
 //Inicio dos testes
 
 //testes da aplicação
@@ -49,7 +56,7 @@ describe('Testes da aplicaçao',  () => {
     });
     it('o servidor esta online', function (done) {
         chai.request(app)
-        .get('/')
+        .get(`${BASE_URL}/`)
         .end(function (err, res) {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
@@ -59,7 +66,7 @@ describe('Testes da aplicaçao',  () => {
 
     it('deveria ser uma lista vazia de usuarios', function (done) {
         chai.request(app)
-        .get('/users')
+        .get(`${BASE_URL}/users`)
         .end(function (err, res) {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
@@ -71,7 +78,7 @@ describe('Testes da aplicaçao',  () => {
     describe('Testes de criação de usuário', () => {
         it('deveria criar o usuario raupp', function (done) {
             chai.request(app)
-            .post('/users')
+            .post(`${BASE_URL}/users`)
             .send({nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35})
             .end(function (err, res) {
                 expect(err).to.be.null;
@@ -110,7 +117,7 @@ describe('Testes da aplicaçao',  () => {
             ];
             users.forEach((user) => {
                 chai.request(app)
-                .post('/users')
+                .post(`${BASE_URL}/users`)
                 .send({ ...user })
                 .end( (err, res) => {
                     expect(err).to.be.null;
@@ -122,20 +129,29 @@ describe('Testes da aplicaçao',  () => {
     });
 
     describe('Testes de leitura do repositório de usuários', () => {
+        it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
+            chai.request(app)
+            .get(`${BASE_URL}/users`)
+            .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            expect(res.body.total).to.be.at.least(5);
+            done();
+            });
+        });
         it('o usuario naoExiste não existe no sistema', function (done) {
             chai.request(app)
-            .get('/users/naoExiste')
+            .get(`${BASE_URL}/users/naoExiste`)
             .end(function (err, res) {
-                expect(err.response.body.error).to.be.equal('User not found'); //possivelmente forma errada de verificar a mensagem de erro
+                expect(res.error.text).to.be.equal('User not found'); 
                 expect(res).to.have.status(404);
-                expect(res.body).to.be.jsonSchema(userSchema);
                 done();
             });
         });
     
         it('o usuario raupp existe e é valido', function (done) {
             chai.request(app)
-            .get('/users/raupp')
+            .get(`${BASE_URL}/users/raupp`)
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
@@ -144,16 +160,7 @@ describe('Testes da aplicaçao',  () => {
             });
         });
 
-        it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
-            chai.request(app)
-            .get('/users')
-            .end(function (err, res) {
-            expect(err).to.be.null;
-            expect(res).to.have.status(200);
-            expect(res.body.total).to.be.at.least(5);
-            done();
-            });
-        });
+        
     });
 
 
@@ -161,7 +168,7 @@ describe('Testes da aplicaçao',  () => {
         it('atualiza todos os campos do usuário', (done) => {
             const userToUpdate = { nome:"fernando", email:"fernando@devoz.com.br", idade:31 };
             chai.request(app)
-            .put(`/users/${userToUpdate['nome']}`)
+            .put(`${BASE_URL}/users/${userToUpdate['nome']}`)
             .send(userToUpdate)
             .end( (err, res) => {
                 expect(err).to.be.null;
@@ -171,9 +178,9 @@ describe('Testes da aplicaçao',  () => {
         });
         it('atualiza o campo idade do usuário', (done) => {
             const nome = "fernando";
-            const fieldPatch = {op: "replace", path: `/idade`, value: "45"};
+            const fieldPatch = {op: "replace", path: `/idade`, value: 45};
             chai.request(app)
-            .patch(`/users/${nome}`)
+            .patch(`${BASE_URL}/users/${nome}`)
             .send(fieldPatch)
             .end( (err, res) => {
                 expect(err).to.be.null;
@@ -185,7 +192,7 @@ describe('Testes da aplicaçao',  () => {
             const nome = "fernando";
             const fieldPatch = {op: "replace", path: `/email`, value: "fernando@mail.com"};
             chai.request(app)
-            .patch(`/users/${nome}`)
+            .patch(`${BASE_URL}/users/${nome}`)
             .send(fieldPatch)
             .end( (err, res) => {
                 expect(err).to.be.null;
@@ -198,22 +205,20 @@ describe('Testes da aplicaçao',  () => {
     describe('Testes de exclusão de usuários do repositório', () => {
         it('deveria excluir o usuario raupp', function (done) {
             chai.request(app)
-            .delete('/users/raupp')
+            .delete(`${BASE_URL}/users/raupp`)
             .end(function (err, res) {
                 expect(err).to.be.null;
-                expect(res).to.have.status(200);
-                expect(res.body).to.be.jsonSchema(userSchema);
+                expect(res).to.have.status(204);
                 done();
             });
         });
     
         it('o usuario raupp não deve existir mais no sistema', function (done) {
             chai.request(app)
-            .get('/users/raupp')
+            .get(`${BASE_URL}/users/raupp`)
             .end(function (err, res) {
                 expect(err).to.be.null;
-                expect(res).to.have.status(200);
-                expect(res.body).to.be.jsonSchema(userSchema);
+                expect(res).to.have.status(404);
                 done();
             });
         });

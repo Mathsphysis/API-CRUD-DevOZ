@@ -21,8 +21,12 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/developmentOneZero/fileteste#readme",
   "dependencies": {
+    "config": "^3.3.6",
     "koa": "^2.13.0",
-    "koa-router": "^9.4.0"
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^9.4.0",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "chai": "^4.2.0",
