@@ -74,17 +74,15 @@ async function invalidFieldsErrGen(validationErrors) {
         name: 'Invalid model fields error', 
         invalidFields: validationErrors.errors, 
         message: validationErrors.message, 
-        type: 'InvalidModelFieldsError' 
     };
-    return await errorFactory.getError(err);
+    return await errorFactory.getError(err, 'InvalidModelFieldsError');
 }
 
 async function userNotFoundErrGen(resourceName) {
     const err = { 
         name: 'User not found error', 
         query: `WHERE name='${resourceName}'`, 
-        type: 'UserNotFoundError' 
     };
-    return await errorFactory.getError(err);
+    return await errorFactory.getError(err, 'UserNotFoundError');
 }
 module.exports = SQLRepository;
