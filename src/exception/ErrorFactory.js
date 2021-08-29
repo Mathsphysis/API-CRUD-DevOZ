@@ -3,7 +3,7 @@ const InvalidModelFieldsError = require('./InvalidModelFieldsError');
 const InvalidModelFieldNameError = require('./InvalidModelFieldNameError');
 const InvalidPageValueError = require('./InvalidPageValueError');
 const InvalidPaginationLimitValueError = require('./InvalidPaginationLimitValueError');
-
+const InvalidOperationRequestedError = require('./InvalidOperationRequestedError');
 class ErrorFactory {
     constructor() {}
 
@@ -34,6 +34,10 @@ const errorTypes = {
     InvalidPageValueError(err) {
         const { name, queryPage } = err;
         throw new InvalidPageValueError(name, queryPage);
+    },
+    InvalidOperationRequestedError(err) {
+        const { name, op } = err;
+        throw new InvalidOperationRequestedError(name, op);
     }
 }
 
