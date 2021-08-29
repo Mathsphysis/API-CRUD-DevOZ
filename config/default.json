@@ -8,7 +8,7 @@
         "storage": ":memory:",
         "logging": false,
         "pool": {
-          "idle": 90000
+          "idle": 10000
         }
       }
     },

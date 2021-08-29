@@ -19,12 +19,20 @@ router.get("/", async (ctx) => {
 });
 
 router.get("/users", async (ctx) => {
+  const queryPage = ctx.request.query.page;
+  const queryLimit = ctx.request.query.limit;
   try {
-    const users = await userService.findAll(ctx);
+    const usersPage = await userService.findAll(queryPage, queryLimit);
     ctx.status = 200;
-    ctx.body = { total: users.length, count: 0, rows: users };
+    ctx.body = { 
+      total: usersPage.count, 
+      currentPageUsersCount: usersPage.rows.length, 
+      rows: usersPage.rows, 
+      totalPages: usersPage.totalPages, 
+      currentPage: usersPage.currentPage 
+    };
   } catch (err) {
-    ctx.throw(500);
+    ctx.throw(err.statusCode, err.message);
   }
 });
 
@@ -35,7 +43,7 @@ router.get("/users/:id", async (ctx) => {
         ctx.response.status = 200;
         ctx.body = user;
     } catch (err) {
-        ctx.throw(err.statusCode, err.message);
+      ctx.throw(err.statusCode, err.message);
     }
 });
 

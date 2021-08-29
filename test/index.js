@@ -125,7 +125,10 @@ describe('Testes da aplicaçao',  () => {
     });
 
     describe('Testes de leitura do repositório de usuários', () => {
-        before( async () => await loadDB() );
+        beforeEach( async () => {
+            await cleanup();
+            return await loadDB();
+        });
         after( async () => await cleanup() );
         it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
             chai.request(app)
@@ -157,14 +160,70 @@ describe('Testes da aplicaçao',  () => {
                 done();
             });
         });
+        it('retorna os resultados com paginação', (done) => {
+            chai.request(app)
+            .get(`${BASE_URL}/users?page=2`)
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body.currentPage).to.be.equal(2);
+                done();
+            });
+        });
+        it('retorna os resultados com paginação com limite definido pelo cliente', (done) => {
+            const users = [ ...usersPredefined, raupp ];
+            const limit = 2;
+            const page = 1;
+            const total = users.length;
+            const totalPages = Math.ceil(total / limit);
+            const isLastPage = page === totalPages;
+            const lastPageCount = total - (totalPages - 1) * limit;
+            const count = isLastPage ? lastPageCount : limit;
+            chai.request(app)
+            .get(`${BASE_URL}/users?page=${page}&limit=${limit}`)
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body.totalPages).to.be.equal(totalPages);
+                expect(res.body.currentPageUsersCount).to.be.equal(count);
+
+                done();
+            });
+        });
+
+        it('retorna erro se a pagina definida pelo cliente for invalida', (done) => {
+            const limit = 2;
+            const page = 'paginaInvalida';
+            chai.request(app)
+            .get(`${BASE_URL}/users?page=${page}&limit=${limit}`)
+            .end(function (err, res) {
+                expect(res).to.have.status(400);
+                expect(res.error.text).to.be.equal('Bad request: Invalid query page value: paginaInvalida');
+                done();
+            });
+        });
+
+        it('retorna erro se o limite definido pelo cliente for invalido', (done) => {
+            const limit = 'limiteInvalido';
+            const page = 1;
+            chai.request(app)
+            .get(`${BASE_URL}/users?page=${page}&limit=${limit}`)
+            .end(function (err, res) {
+                expect(res).to.have.status(400);
+                expect(res.error.text).to.be.equal('Bad request: Invalid query limit value: limiteInvalido');
+                done();
+            });
+        });
 
         
     });
 
 
     describe('Testes de atualização do repositório de usuários', () => {
-        before( async () => await loadDB() );
-        after( async () => await cleanup() );
+        beforeEach( async () => {
+            await cleanup();
+            return await loadDB();
+        });
 
         const tests = [
             { 
@@ -187,8 +246,8 @@ describe('Testes da aplicaçao',  () => {
             .end( (err, res) => {
                 expect(err).to.be.null;
                 expect(res).to.have.status(204)
+                done();
             });
-            done();
         });
         it('atualiza o campo idade do usuário', (done) => {
             const nome = "fernando";
@@ -199,8 +258,8 @@ describe('Testes da aplicaçao',  () => {
             .end( (err, res) => {
                 expect(err).to.be.null;
                 expect(res).to.have.status(204)
+                done();
             });
-            done();
         });
         it('atualiza o campo email do usuário', (done) => {
             const nome = "fernando";
@@ -211,8 +270,8 @@ describe('Testes da aplicaçao',  () => {
             .end( (err, res) => {
                 expect(err).to.be.null;
                 expect(res).to.have.status(204)
+                done();
             });
-            done();
         });
         it('retorna status 400 para pedidos inválidos no PUT', (done) => {
             const userToUpdate = { nome:"fernando" };

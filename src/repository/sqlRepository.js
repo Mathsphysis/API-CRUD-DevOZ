@@ -11,8 +11,9 @@ class SQLRepository extends IRepository {
         this.model = SQLModel;
     }
 
-    async findAll() {
-        return await this.model.findAll();
+    async findAll(offset, limit) {
+        const users = await this.model.findAndCountAll({ offset, limit });
+        return users;
     }
 
     async findOneByName(name) {

@@ -4,10 +4,32 @@ const errorFactory = new ErrorFactory();
 
 function UserService(userRepository) {
 
- async function findAll () {
-    try{
-        return await userRepository.findAll();
-    } catch (err) {
+ async function findAll (queryPage, queryLimit) {
+    try {
+        let limit = 10;
+        let page = 1;
+        if(queryLimit !== undefined) {
+            limit = parseInt(queryLimit);
+        }
+        if(queryPage !== undefined) {
+            page = parseInt(queryPage);
+        }
+
+        if(isNaN(page) || page < 1) {
+            return await invalidPageValueErrGen(queryPage); 
+        }
+        if(isNaN(limit) || limit < 1) {
+            return await invalidPaginationLimitValueErrGen(queryLimit); 
+        }
+
+        const offset = (page - 1) * limit;
+        let users = await userRepository.findAll(offset, limit);
+    
+        const totalPages = Math.ceil(users.count / limit);
+        users.totalPages = totalPages;
+        users.currentPage = page;
+        return users;
+    } catch(err) {
         throw err;
     }
 };
@@ -76,6 +98,24 @@ const validFields = {
     nome: 'nome',
     email: 'email',
     idade: 'idade'
+}
+
+async function invalidPageValueErrGen(page){
+    const err = {
+        name: 'Invalid Page Value Error',
+        queryPage: page,
+        type: 'InvalidPageValueError'
+    }
+    return await errorFactory.getError(err);
+}
+
+async function invalidPaginationLimitValueErrGen(limit){
+    const err = {
+        name: 'Invalid Pagination Limit Value Error',
+        queryLimit: limit,
+        type: 'InvalidPaginationLimitValueError'
+    }
+    return await errorFactory.getError(err);
 }
 
 module.exports = UserService;
