@@ -52,7 +52,8 @@ function UserService(userRepository) {
 
   async function deleteByName(id) {
     try {
-        return await userRepository.deleteByName(id);
+        await userRepository.deleteByName(id);
+        return 'success';
     } catch (err) {
         throw err;
     }
@@ -60,7 +61,8 @@ function UserService(userRepository) {
 
  async function updateByName(id, userToUpdate) {
     try {
-        return await userRepository.updateByName(id, userToUpdate);
+        await userRepository.updateByName(id, userToUpdate);
+        return 'success';
     } catch (err) {
         throw err;
     }
@@ -76,7 +78,8 @@ function UserService(userRepository) {
             };
             return await errorFactory.getError(err, 'InvalidModelFieldNameError');
         }
-        return await userRepository.replaceField(name, field, value);
+        await userRepository.replaceField(name, field, value);
+        return 'success';
     } catch (err) {
         throw err;
     }

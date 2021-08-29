@@ -5,17 +5,14 @@ const Regex = require('../config/regexValidators');
 const errorFactory = new ErrorFactory();
 
 async function validate(arg, opt) {
-    const validationErrors = {};
+    let validationErrors = {};
     validationErrors.errors = [];
     validationErrors.message = '';
-
     if(opt.field) {
-        validationErrors.errors = await validateOptions[opt.field](arg);
+      validationErrors.errors = await validateOptions[opt.field](arg);
+    } else if(opt.user) {
+      validationErrors.errors = await validateOptions[opt.user](arg);
     }
-    if(opt.user) {
-        validationErrors.errors = await validateOptions[opt.user](arg);
-    }
-  
     if(validationErrors.errors.length === 0){
       return "sucess";
     }
@@ -58,6 +55,7 @@ async function validate(arg, opt) {
       if(validationError){
         errors.push(validationError);
       }
+      return errors;
     }
   }
   

@@ -17,7 +17,7 @@ class ArrayRepository extends IRepository {
 
   async findAll(offset, limit) {
     const end = offset + limit;
-    const userRows = usersDB.slice(offset, end);
+    const userRows = this.usersDB.slice(offset, end);
     const users = {
       rows: userRows,
       count: this.usersDB.length
@@ -80,9 +80,8 @@ async function userNotFoundErrGen(resourceName) {
   const err = {
     name: "User not found error",
     query: `WHERE name='${resourceName}'`,
-    type: "UserNotFoundError",
   };
-  return await errorFactory.getError(err);
+  return await errorFactory.getError(err, 'UserNotFoundError');
 }
 
 
