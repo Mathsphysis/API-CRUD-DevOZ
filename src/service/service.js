@@ -12,6 +12,22 @@ function UserService(userRepository) {
     }
 };
 
+async function findWithPagination(page, limit) {
+    if(page === NaN){
+        const err = {
+            name: 'Invalid Page Value Error',
+            field: `Page contains an invalid value`,
+            type: 'InvalidPageValueError'
+        };
+        return await errorFactory.getError(err);
+    }
+    const totalPages = Math.ceil(users.count / limit);
+    const offset = (page - 1) * limit;
+    const users = await userRepository.findWithOffsetAndLimit(offset, limit);
+    users.totalPages = totalPages;
+    users.currentPage = page;
+}
+
  async function findOneByName(name) {
   try {
       return await userRepository.findOneByName(name);
@@ -64,6 +80,7 @@ function UserService(userRepository) {
 return {
     save,
     findAll,
+    findWithPagination,
     findOneByName,
     deleteByName,
     updateByName,

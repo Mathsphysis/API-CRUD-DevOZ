@@ -125,7 +125,10 @@ describe('Testes da aplicaçao',  () => {
     });
 
     describe('Testes de leitura do repositório de usuários', () => {
-        before( async () => await loadDB() );
+        beforeEach( async () => {
+            await cleanup();
+            return await loadDB();
+        });
         after( async () => await cleanup() );
         it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
             chai.request(app)
@@ -157,23 +160,30 @@ describe('Testes da aplicaçao',  () => {
                 done();
             });
         });
-        it('retorna os resultados com paginação', () => {
+        it('retorna os resultados com paginação', (done) => {
             chai.request(app)
-            .get(`${BASE_URL}/users/raupp?page=1`)
+            .get(`${BASE_URL}/users?page=2`)
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
-                expect(res.body).to.be.jsonSchema(userSchema);
+                expect(res.body.currentPage).to.be.equal(2);
                 done();
             });
         });
-        it('retorna os resultados com paginação com limite definido pelo cliente', () => {
+        it('retorna os resultados com paginação com limite definido pelo cliente', (done) => {
+            const users = [ ...usersPredefined, raupp ];
+            const limit = 10;
+            const page = 1;
+            const total = users.length;
+            const totalPages = Math.ceil(total / limit);
+            const count = (total - (page - 1) * limit) % limit;
             chai.request(app)
-            .get(`${BASE_URL}/users/raupp?page=1&limit=10`)
+            .get(`${BASE_URL}/users?page=${page}&limit=${limit}`)
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
-                expect(res.body).to.be.jsonSchema(userSchema);
+                expect(res.body.totalPages).to.be.equal(totalPages);
+                expect(res.body.currentPageUsersCount).to.be.equal(count)
                 done();
             });
         });
@@ -183,8 +193,10 @@ describe('Testes da aplicaçao',  () => {
 
 
     describe('Testes de atualização do repositório de usuários', () => {
-        before( async () => await loadDB() );
-        after( async () => await cleanup() );
+        beforeEach( async () => {
+            await cleanup();
+            return await loadDB();
+        });
 
         const tests = [
             { 
@@ -207,8 +219,8 @@ describe('Testes da aplicaçao',  () => {
             .end( (err, res) => {
                 expect(err).to.be.null;
                 expect(res).to.have.status(204)
+                done();
             });
-            done();
         });
         it('atualiza o campo idade do usuário', (done) => {
             const nome = "fernando";
@@ -219,8 +231,8 @@ describe('Testes da aplicaçao',  () => {
             .end( (err, res) => {
                 expect(err).to.be.null;
                 expect(res).to.have.status(204)
+                done();
             });
-            done();
         });
         it('atualiza o campo email do usuário', (done) => {
             const nome = "fernando";
@@ -231,8 +243,8 @@ describe('Testes da aplicaçao',  () => {
             .end( (err, res) => {
                 expect(err).to.be.null;
                 expect(res).to.have.status(204)
+                done();
             });
-            done();
         });
         it('retorna status 400 para pedidos inválidos no PUT', (done) => {
             const userToUpdate = { nome:"fernando" };

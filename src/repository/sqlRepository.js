@@ -23,6 +23,11 @@ class SQLRepository extends IRepository {
         return userFound;
     }
 
+    async findWithOffsetAndLimit(offset, limit) {
+        const users = await this.model.findAndCountAll({ offset, limit });
+        return users;
+    }
+
     async save(userToSave) {
         try {
             return await this.model.create({ ...userToSave });
