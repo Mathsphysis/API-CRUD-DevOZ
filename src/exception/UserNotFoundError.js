@@ -1,9 +1,9 @@
-const BaseError = require('./BaseError');
+const NotFoundError = require('./NotFoundError');
 const httpStatusCode = require('../utils/httpStatusCode');
 
-class UserNotFoundError extends BaseError {
+class UserNotFoundError extends NotFoundError {
     constructor(name, query) {
-        super(name, httpStatusCode.NOT_FOUND, true, `User with ${query} not found`, 'UserNotFoundError');
+        super(name, `User with ${query} not found`, 'UserNotFoundError');
     }
 }
 

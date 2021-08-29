@@ -115,7 +115,7 @@ describe('Testes da aplicaçao',  () => {
             .post(`${BASE_URL}/users`)
             .send({nome: "raupp"})
             .end(function (err, res) {
-                expect(res.error.text).to.be.equal('Bad request: Bad request: Invalid fields:\n' +
+                expect(res.body.message).to.be.equal('Bad Request: Invalid fields:\n' +
                 'notNull Violation: user.email cannot be null,' +
                 '\nnotNull Violation: user.idade cannot be null');
                 done();
@@ -144,7 +144,7 @@ describe('Testes da aplicaçao',  () => {
             chai.request(app)
             .get(`${BASE_URL}/users/naoExiste`)
             .end(function (err, res) {
-                expect(res.error.text).to.be.equal('User with WHERE name=\'naoExiste\' not found'); 
+                expect(res.body.message).to.be.equal('Not Found: User with WHERE name=\'naoExiste\' not found'); 
                 expect(res).to.have.status(404);
                 done();
             });
@@ -198,7 +198,7 @@ describe('Testes da aplicaçao',  () => {
             .get(`${BASE_URL}/users?page=${page}&limit=${limit}`)
             .end(function (err, res) {
                 expect(res).to.have.status(400);
-                expect(res.error.text).to.be.equal('Bad request: Invalid query page value: paginaInvalida');
+                expect(res.body.message).to.be.equal('Bad Request: Invalid query page value: paginaInvalida');
                 done();
             });
         });
@@ -210,7 +210,7 @@ describe('Testes da aplicaçao',  () => {
             .get(`${BASE_URL}/users?page=${page}&limit=${limit}`)
             .end(function (err, res) {
                 expect(res).to.have.status(400);
-                expect(res.error.text).to.be.equal('Bad request: Invalid query limit value: limiteInvalido');
+                expect(res.body.message).to.be.equal('Bad Request: Invalid query limit value: limiteInvalido');
                 done();
             });
         });
@@ -229,12 +229,12 @@ describe('Testes da aplicaçao',  () => {
             { 
                 field: 'email', 
                 value: 'invalidEmail', 
-                expectedMessage: 'Bad request: Bad request: Invalid fields:\nValidation error: Validation is on email failed'
+                expectedMessage: 'Bad Request: Invalid fields:\nValidation error: Validation is on email failed'
             },
             { 
                 field: 'idade', 
                 value: 16, 
-                expectedMessage: 'Bad request: Bad request: Invalid fields:\nValidation error: Validation min on idade failed'
+                expectedMessage: 'Bad Request: Invalid fields:\nValidation error: Validation min on idade failed'
             },
         ]
 
@@ -289,7 +289,7 @@ describe('Testes da aplicaçao',  () => {
             .put(`${BASE_URL}/users/${userToUpdate['nome']}`)
             .send({nome: "raupp"})
             .end(function (err, res) {
-                expect(res.error.text).to.be.equal('Bad request: Bad request: Invalid fields:\n' +
+                expect(res.body.message).to.be.equal('Bad Request: Invalid fields:\n' +
                 'notNull Violation: user.email cannot be null,' +
                 '\nnotNull Violation: user.idade cannot be null');
                 done();
@@ -303,7 +303,7 @@ describe('Testes da aplicaçao',  () => {
             .send(fieldPatch)
             .end(function (err, res) {
                 expect(res.status).to.be.equal(400);
-                expect(res.error.text).to.be.equal(`Invalid operation requested: ${fieldPatch.op}`);
+                expect(res.body.message).to.be.equal(`Bad Request: Invalid operation requested: ${fieldPatch.op}`);
                 done();
             });
         });
@@ -315,7 +315,7 @@ describe('Testes da aplicaçao',  () => {
             .send(fieldPatch)
             .end(function (err, res) {
                 expect(res.status).to.be.equal(400);
-                expect(res.error.text).to.be.equal('Bad request: Bad request: Invalid field name:\nema is not a valid model field');
+                expect(res.body.message).to.be.equal('Bad Request: Invalid field name:\nema is not a valid model field');
                 done();
             });
         });
@@ -329,7 +329,7 @@ describe('Testes da aplicaçao',  () => {
                 .send(fieldPatch)
                 .end(function (err, res) {
                     expect(res.status).to.be.equal(400);
-                    expect(res.error.text).to.be.equal(expectedMessage);
+                    expect(res.body.message).to.be.equal(expectedMessage);
                     done();
                 });
             });
@@ -340,7 +340,7 @@ describe('Testes da aplicaçao',  () => {
             .put(`${BASE_URL}/users/naoExiste`)
             .end(function (err, res) {
                 expect(res).to.have.status(404);
-                expect(res.error.text).to.be.equal('User with WHERE name=\'naoExiste\' not found');
+                expect(res.body.message).to.be.equal('Not Found: User with WHERE name=\'naoExiste\' not found');
                 done();
             });
         });
@@ -351,7 +351,7 @@ describe('Testes da aplicaçao',  () => {
             .send(fieldPatch)
             .end(function (err, res) {
                 expect(res).to.have.status(404);
-                expect(res.error.text).to.be.equal('User with WHERE name=\'naoExiste\' not found');
+                expect(res.body.message).to.be.equal('Not Found: User with WHERE name=\'naoExiste\' not found');
                 done();
             });
         });
@@ -383,7 +383,7 @@ describe('Testes da aplicaçao',  () => {
             .delete(`${BASE_URL}/users/naoExiste`)
             .end(function (err, res) {
                 expect(res).to.have.status(404);
-                expect(res.error.text).to.be.equal('User with WHERE name=\'naoExiste\' not found');
+                expect(res.body.message).to.be.equal('Not Found: User with WHERE name=\'naoExiste\' not found');
                 done();
             });
         });

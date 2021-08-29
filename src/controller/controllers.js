@@ -4,10 +4,12 @@ const config = require('config');
 const repoConfig = config.get('repository');
 
 const UserService = require('../service/service');
+const ErrorFactory = require("../exception/ErrorFactory");
 const UserRepository = require(`../repository/${repoConfig.name}`);
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
+const errorFactory = new ErrorFactory();
 
 let router = new Router({
     prefix: '/api/v1'
@@ -32,7 +34,7 @@ router.get("/users", async (ctx) => {
       currentPage: usersPage.currentPage 
     };
   } catch (err) {
-    ctx.throw(err.statusCode, err.message);
+    throw err;
   }
 });
 
@@ -43,7 +45,7 @@ router.get("/users/:id", async (ctx) => {
         ctx.response.status = 200;
         ctx.body = user;
     } catch (err) {
-      ctx.throw(err.statusCode, err.message);
+      throw err;
     }
 });
 
@@ -54,7 +56,7 @@ router.post("/users", async (ctx) => {
     ctx.response.status = 201;
     ctx.body = user;
   } catch (err) {
-    ctx.throw( err.statusCode, err.message, { invalidFields: err.invalidFields });
+    throw err;
   }
 });
 
@@ -65,7 +67,7 @@ router.put("/users/:id", async (ctx) => {
     await userService.updateByName(id, userToUpdate);
     ctx.response.status = 204;
   } catch (err) {
-    ctx.throw(err.statusCode, err.message);
+    throw err;
   }
 });
 
@@ -75,13 +77,13 @@ router.patch("/users/:id", async (ctx) => {
   const field = path.substring(1);
   const requestedOp = acceptedOps[op];
   if(requestedOp === undefined){
-    return ctx.throw(400, `Invalid operation requested: ${op}`);
+    return await invalidOperationRequestedError(op);
   }
   try {
     await requestedOp(id, field, value);
     return ctx.response.status = 204;
   } catch (err) {
-    return ctx.throw(err.statusCode, err.message);
+    throw err;
   }
 });
 
@@ -91,7 +93,7 @@ router.delete("/users/:id", async (ctx) => {
     await userService.deleteByName(id);
     ctx.response.status = 204;
   } catch (err) {
-    ctx.throw(err.statusCode, err.message);
+    throw err;
   }
 });
 
@@ -99,6 +101,15 @@ const acceptedOps = {
   async replace(name, field, value) {
     await userService.replaceField(name,field,value);
   }
+}
+
+async function invalidOperationRequestedError(op) {
+  const err = {
+    name: 'Invalid Operation Requested Error',
+    type: 'InvalidOperationRequestedError',
+    op: op
+  }
+  return await errorFactory.getError(err);
 }
 
 module.exports = router;
