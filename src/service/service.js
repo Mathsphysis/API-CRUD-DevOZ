@@ -73,9 +73,8 @@ function UserService(userRepository) {
             const err = {
                 name: 'Invalid Model Field Name Error',
                 field: `${field} is not a valid model field`,
-                type: 'InvalidModelFieldNameError'
             };
-            return await errorFactory.getError(err);
+            return await errorFactory.getError(err, 'InvalidModelFieldNameError');
         }
         return await userRepository.replaceField(name, field, value);
     } catch (err) {
@@ -104,18 +103,16 @@ async function invalidPageValueErrGen(page){
     const err = {
         name: 'Invalid Page Value Error',
         queryPage: page,
-        type: 'InvalidPageValueError'
     }
-    return await errorFactory.getError(err);
+    return await errorFactory.getError(err, 'InvalidPageValueError');
 }
 
 async function invalidPaginationLimitValueErrGen(limit){
     const err = {
         name: 'Invalid Pagination Limit Value Error',
         queryLimit: limit,
-        type: 'InvalidPaginationLimitValueError'
     }
-    return await errorFactory.getError(err);
+    return await errorFactory.getError(err, 'InvalidPaginationLimitValueError');
 }
 
 module.exports = UserService;

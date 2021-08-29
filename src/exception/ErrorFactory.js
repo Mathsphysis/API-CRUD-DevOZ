@@ -7,9 +7,9 @@ const InvalidOperationRequestedError = require('./InvalidOperationRequestedError
 class ErrorFactory {
     constructor() {}
 
-    async getError(err){
-        if( Object.prototype.hasOwnProperty.call(err, 'type') ) {
-            return errorTypes[err.type](err);
+    async getError(err, type){
+        if(typeof type === 'string') {
+            return errorTypes[type](err);
         }
     }
 }
