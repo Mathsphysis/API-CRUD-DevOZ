@@ -106,10 +106,9 @@ const acceptedOps = {
 async function invalidOperationRequestedError(op) {
   const err = {
     name: 'Invalid Operation Requested Error',
-    type: 'InvalidOperationRequestedError',
     op: op
   }
-  return await errorFactory.getError(err);
+  return await errorFactory.getError(err, 'InvalidOperationRequestedError');
 }
 
 module.exports = router;

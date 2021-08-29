@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=dev node src/index.js",
-    "test": "mocha"
+    "test": "NODE_ENV=test mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/developmentOneZero/fileteste.git"
+    "url": "https://github.com/Mathsphysis/API-CRUD-DevOZ.git"
   },
   "keywords": [
     "test",
@@ -17,9 +17,9 @@
     "file",
     "changes"
   ],
-  "author": "jose.raupp@devoz.com.br <Jose Raupp>",
+  "author": "smathsphysis@gmail.com <Maths Physis>",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/developmentOneZero/fileteste#readme",
+  "homepage": "https://github.com/Mathsphysis/API-CRUD-DevOZ/tree/main#readme",
   "dependencies": {
     "config": "^3.3.6",
     "koa": "^2.13.0",

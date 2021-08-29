@@ -1,4 +1,3 @@
-//sample test
 //Para rodar os testes, use: npm test
 
 // veja mais infos em:
@@ -27,31 +26,33 @@ const BASE_URL = '/api/v1';
 
 const raupp = { nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35 };
 
-const loadDB = async function () {
-    const users = [ ...usersPredefined, raupp];
-    users.forEach( async (user) => {
-        return await chai.request(app)
-        .post(`${BASE_URL}/users`)
-        .send({ ...user });
-    });
-};
-
-const cleanup = async function () {
-    return await User.destroy({ truncate: true });
-}
-
-before( async () => {
-    await sequelize.sync();  
-});
-
-after('cleanup geral', () => {
-    server.close();
-});
-
 //Inicio dos testes
 
 //testes da aplicação
-describe('Testes da aplicaçao',  () => {
+describe('Testes da aplicaçao', function () {
+    // this.retries(5);
+
+    const loadDB = async function () {
+        const users = [ ...usersPredefined, raupp];
+        users.forEach( async (user) => {
+            return await chai.request(app)
+            .post(`${BASE_URL}/users`)
+            .send({ ...user });
+        });
+    };
+    
+    const cleanup = async function () {
+        return await User.destroy({ truncate: true });
+    }
+    
+    before( async () => {
+        await sequelize.sync();  
+    });
+    
+    after('cleanup geral', () => {
+        server.close();
+    });
+    
  
     it('o servidor esta online', function (done) {
         chai.request(app)
@@ -225,19 +226,6 @@ describe('Testes da aplicaçao',  () => {
             return await loadDB();
         });
 
-        const tests = [
-            { 
-                field: 'email', 
-                value: 'invalidEmail', 
-                expectedMessage: 'Bad Request: Invalid fields:\nValidation error: Validation is on email failed'
-            },
-            { 
-                field: 'idade', 
-                value: 16, 
-                expectedMessage: 'Bad Request: Invalid fields:\nValidation error: Validation min on idade failed'
-            },
-        ]
-
         it('atualiza todos os campos do usuário', (done) => {
             const userToUpdate = { nome:"fernando", email:"fernando@devoz.com.br", idade:31 };
             chai.request(app)
@@ -319,6 +307,19 @@ describe('Testes da aplicaçao',  () => {
                 done();
             });
         });
+
+        const tests = [
+            { 
+                field: 'email', 
+                value: 'invalidEmail', 
+                expectedMessage: 'Bad Request: Invalid fields:\nValidation error: Validation is on email failed'
+            },
+            { 
+                field: 'idade', 
+                value: 16, 
+                expectedMessage: 'Bad Request: Invalid fields:\nValidation error: Validation min on idade failed'
+            },
+        ]
 
         tests.forEach( ({field, value, expectedMessage}) => {
             it(`retorna erro para ${field} inválido no PATCH`, (done) => {
