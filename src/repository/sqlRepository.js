@@ -1,4 +1,3 @@
-const UserNotFoundError = require('../exception/UserNotFoundError');
 const ErrorFactory = require('../exception/ErrorFactory');
 const IRepository = require('./IRepository');
 const SQLModel = require('./sqlModel');
@@ -81,7 +80,11 @@ async function invalidFieldsErrGen(validationErrors) {
 }
 
 async function userNotFoundErrGen(resourceName) {
-    const err = { name: 'User not found error', query: `WHERE name='${resourceName}'`, type: 'UserNotFoundError' };
+    const err = { 
+        name: 'User not found error', 
+        query: `WHERE name='${resourceName}'`, 
+        type: 'UserNotFoundError' 
+    };
     return await errorFactory.getError(err);
 }
 module.exports = SQLRepository;

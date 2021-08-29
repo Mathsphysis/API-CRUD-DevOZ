@@ -30,8 +30,15 @@ koa
   .use(router.allowedMethods());
 
 koa.on('error', (err, ctx) => {
-  ctx.response.status = err.status || 500;
-  ctx.body = err.message;
+  if(err.isOperacional) {
+    ctx.response.status = err.statusCode;
+    const message = err.message;
+    const properties = err.properties;
+    const exposedErr = { message, properties };
+    ctx.body = exposedErr;
+  } else {
+    throw err;
+  }
 });
 
 const server = koa.listen(PORT);
