@@ -20,10 +20,13 @@ router.get("/", async (ctx) => {
 
 router.get("/users", async (ctx) => {
   let { page, limit } = ctx.request.query;
-  limit = limit ? parseInt(limit) : 10;
-  page = page ? parseInt(page) : 1;
-
   try {
+    page = parseInt(page);
+    if(page === NaN || page < 1) {
+      return 
+    }
+    limit = limit ? parseInt(limit) : 10;
+    page = page ? parseInt(page) : 1;
     const usersPage = await userService.findAll(page, limit);
     ctx.status = 200;
     ctx.body = { 
@@ -45,7 +48,7 @@ router.get("/users/:id", async (ctx) => {
         ctx.response.status = 200;
         ctx.body = user;
     } catch (err) {
-        ctx.throw(err.statusCode, err.message);
+      ctx.throw(err.statusCode, err.message);
     }
 });
 
