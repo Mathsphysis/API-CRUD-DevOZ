@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 
 const sequelize = require('../config/database');
+const Regex = require('../config/regexValidators');
 
 const { Model } = Sequelize;
 
@@ -11,14 +12,21 @@ User.init(
         nome: {
             type: Sequelize.STRING,
             allowNull: false,
-            unique: true
+            unique: true,
+            validate: {
+                is: Regex.nameRegex
+            }
         },
         email: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                is: Regex.emailRegex
+            }
         },
         idade: {
             type: Sequelize.INTEGER,
+            allowNull: false,
             validate: {
                 min: 18
             }
