@@ -1,6 +1,8 @@
 const UserNotFoundError = require('./UserNotFoundError');
 const InvalidModelFieldsError = require('./InvalidModelFieldsError');
 const InvalidModelFieldNameError = require('./InvalidModelFieldNameError');
+const InvalidPageValueError = require('./InvalidPageValueError');
+const InvalidPaginationLimitValueError = require('./InvalidPaginationLimitValueError');
 
 class ErrorFactory {
     constructor() {}
@@ -24,6 +26,14 @@ const errorTypes = {
     InvalidModelFieldNameError(err) {
         const { name, field } = err;
         throw new InvalidModelFieldNameError(name, field);
+    },
+    InvalidPaginationLimitValueError(err) {
+        const { name, queryLimit } = err;
+        throw new InvalidPaginationLimitValueError(name, queryLimit);
+    },
+    InvalidPageValueError(err) {
+        const { name, queryPage } = err;
+        throw new InvalidPageValueError(name, queryPage);
     }
 }
 

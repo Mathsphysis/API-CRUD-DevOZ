@@ -1,8 +1,8 @@
 const BadRequestError = require('./BadRequestError');
 
 class InvalidPaginationLimitValueError extends BadRequestError {
-    constructor(name) {
-        super(name, `Bad request: Invalid query limit value`, 'InvalidPaginationLimitValueError');
+    constructor(name, queryLimit) {
+        super(name, `Invalid query limit value: ${queryLimit}`, 'InvalidPaginationLimitValueError');
     }
 }
 
