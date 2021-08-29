@@ -3,16 +3,16 @@ class IRepository {
         if(!this.findAll){
             throw new Error('Repository must have findAll method');
         }
-        if(!this.findOneByID){
-            throw new Error('Repository must have findOneByID method');
+        if(!this.findOneByName){
+            throw new Error('Repository must have findOneByName method');
         }
         if(!this.save){
             throw new Error('Repository must have save method');
         }
-        if(!this.deleteByID){
-            throw new Error('Repository must have deleteByID method');
+        if(!this.deleteByName){
+            throw new Error('Repository must have deleteByName method');
         }
-        if(!this.updateByID){
+        if(!this.updateByName){
             throw new Error('Repository must have update method');
         }
         if(!this.replaceField){

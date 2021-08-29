@@ -31,11 +31,11 @@ router.get("/users", async (ctx) => {
 router.get("/users/:id", async (ctx) => {
   const { id } = ctx.params;
     try {
-        const user = await userService.findOneByID(id);
+        const user = await userService.findOneByName(id);
         ctx.response.status = 200;
         ctx.body = user;
     } catch (err) {
-        ctx.throw(404, err.message);
+        ctx.throw(err.statusCode, err.message);
     }
 });
 
@@ -46,7 +46,7 @@ router.post("/users", async (ctx) => {
     ctx.response.status = 201;
     ctx.body = user;
   } catch (err) {
-    ctx.throw(400, err.message);
+    ctx.throw( err.statusCode, err.message, { invalidFields: err.invalidFields });
   }
 });
 
@@ -54,11 +54,11 @@ router.put("/users/:id", async (ctx) => {
   const userToUpdate = { ...ctx.request.body };
   const { id } = ctx.params;
   try {
-    await userService.updateByID(id, userToUpdate);
+    await userService.updateByName(id, userToUpdate);
+    ctx.response.status = 204;
   } catch (err) {
-    ctx.throw(404, err.message);
+    ctx.throw(err.statusCode, err.message);
   }
-  ctx.response.status = 204;
 });
 
 router.patch("/users/:id", async (ctx) => {
@@ -66,29 +66,30 @@ router.patch("/users/:id", async (ctx) => {
   const { id } = ctx.params;
   const field = path.substring(1);
   const requestedOp = acceptedOps[op];
-  if(requestedOp !== undefined){
-    try {
-      await requestedOp(id, field, value);
-      ctx.response.status = 204;
-    } catch (err) {
-      ctx.throw(404, err.message);
-    }
+  if(requestedOp === undefined){
+    return ctx.throw(400, `Invalid operation requested: ${op}`);
+  }
+  try {
+    await requestedOp(id, field, value);
+    return ctx.response.status = 204;
+  } catch (err) {
+    return ctx.throw(err.statusCode, err.message);
   }
 });
 
 router.delete("/users/:id", async (ctx) => {
   const { id } = ctx.params;
   try {
-    await userService.deleteByID(id);
+    await userService.deleteByName(id);
     ctx.response.status = 204;
   } catch (err) {
-    ctx.throw(404, err.message);
+    ctx.throw(err.statusCode, err.message);
   }
 });
 
 const acceptedOps = {
-  async replace(id, field, value) {
-    await userService.replaceField(id,field,value);
+  async replace(name, field, value) {
+    await userService.replaceField(name,field,value);
   }
 }
 

@@ -6,7 +6,10 @@
       "options": {
         "dialect": "sqlite",
         "storage": ":memory:",
-        "logging": false
+        "logging": false,
+        "pool": {
+          "idle": 90000
+        }
       }
     },
     "repository": {

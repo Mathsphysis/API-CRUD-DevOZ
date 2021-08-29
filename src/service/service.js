@@ -1,18 +1,22 @@
+const ErrorFactory = require("../exception/ErrorFactory");
+
+const errorFactory = new ErrorFactory();
+
 function UserService(userRepository) {
 
  async function findAll () {
     try{
         return await userRepository.findAll();
     } catch (err) {
-        throw new Error(err.message);
+        throw err;
     }
 };
 
- async function findOneByID(id) {
+ async function findOneByName(name) {
   try {
-      return await userRepository.findOneByID(id);
+      return await userRepository.findOneByName(name);
   } catch (err) {
-      throw new Error(err.message);
+      throw err;
   }
 };
 
@@ -20,43 +24,58 @@ function UserService(userRepository) {
     try {
         return await userRepository.save(userToSave);
     } catch (err) {
-        throw new Error(err.message);
+        throw err;
     }
 }
 
-  async function deleteByID(id) {
+  async function deleteByName(id) {
     try {
-        return await userRepository.deleteByID(id);
+        return await userRepository.deleteByName(id);
     } catch (err) {
-        throw new Error(err.message);
+        throw err;
     }
 }
 
- async function updateByID(id, userToUpdate) {
+ async function updateByName(id, userToUpdate) {
     try {
-        return await userRepository.updateByID(id, userToUpdate);
+        return await userRepository.updateByName(id, userToUpdate);
     } catch (err) {
-        throw new Error(err.message);
+        throw err;
     }
 }
 
- async function replaceField(id, field, value) {
+ async function replaceField(name, field, value) {
     try {
-        return await userRepository.replaceField(id, field, value);
+        const validField = validFields[field];
+        if(!validField) {
+            const err = {
+                name: 'Invalid Model Field Name Error',
+                field: `${field} is not a valid model field`,
+                type: 'InvalidModelFieldNameError'
+            };
+            return await errorFactory.getError(err);
+        }
+        return await userRepository.replaceField(name, field, value);
     } catch (err) {
-        throw new Error(err.message);
+        throw err;
     }
 }
 
 return {
     save,
     findAll,
-    findOneByID,
-    deleteByID,
-    updateByID,
+    findOneByName,
+    deleteByName,
+    updateByName,
     replaceField
 };
 
+}
+
+const validFields = {
+    nome: 'nome',
+    email: 'email',
+    idade: 'idade'
 }
 
 module.exports = UserService;
