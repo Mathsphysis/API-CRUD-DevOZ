@@ -19,15 +19,10 @@ router.get("/", async (ctx) => {
 });
 
 router.get("/users", async (ctx) => {
-  let { page, limit } = ctx.request.query;
+  const queryPage = ctx.request.query.page;
+  const queryLimit = ctx.request.query.limit;
   try {
-    page = parseInt(page);
-    if(page === NaN || page < 1) {
-      return 
-    }
-    limit = limit ? parseInt(limit) : 10;
-    page = page ? parseInt(page) : 1;
-    const usersPage = await userService.findAll(page, limit);
+    const usersPage = await userService.findAll(queryPage, queryLimit);
     ctx.status = 200;
     ctx.body = { 
       total: usersPage.count, 
@@ -37,7 +32,7 @@ router.get("/users", async (ctx) => {
       currentPage: usersPage.currentPage 
     };
   } catch (err) {
-    ctx.throw(500);
+    ctx.throw(err.statusCode, err.message);
   }
 });
 
