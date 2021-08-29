@@ -41,7 +41,7 @@ async function validate(arg, opt) {
     async user(userToValidate) {
         const errors = [];
         const validateFields = ['nome', 'idade', 'email'];
-        validateFields.forEach((field) =>  {
+        validateFields.forEach(async (field) =>  {
             if(!userToValidate[field]) {
                 errors.push(`\nnotNull Violation: user.${field} cannot be null`);
             }
