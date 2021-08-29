@@ -157,6 +157,26 @@ describe('Testes da aplicaçao',  () => {
                 done();
             });
         });
+        it('retorna os resultados com paginação', () => {
+            chai.request(app)
+            .get(`${BASE_URL}/users/raupp?page=1`)
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.jsonSchema(userSchema);
+                done();
+            });
+        });
+        it('retorna os resultados com paginação com limite definido pelo cliente', () => {
+            chai.request(app)
+            .get(`${BASE_URL}/users/raupp?page=1&limit=10`)
+            .end(function (err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.jsonSchema(userSchema);
+                done();
+            });
+        });
 
         
     });
