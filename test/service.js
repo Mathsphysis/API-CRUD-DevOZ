@@ -7,120 +7,76 @@
 //https://developer.mozilla.org/pt-PT/docs/Web/HTTP/Status (http codes)
 
 const app =  require('../src/index.js');
-
+const UserService = require('../src/service/service');
+const UserRepository = require('../src/repository/arrayRepository');
 const chai = require('chai')
-const chaiHttp = require('chai-http');
-const chaiJson = require('chai-json-schema');
-const server = require('../src/index.js');
-const sequelize = require('../src/config/database');
-const userSchema = require('./userSchema');
-const User = require('../src/repository/sqlModel.js');
-const usersPredefined = require('./users.js');
 
-chai.use(chaiHttp);
-chai.use(chaiJson);
+const usersPredefined = require('./users.js');
+const userSchema = require('./userSchema');
 
 const expect = chai.expect;
 
-const BASE_URL = '/api/v1';
+const userRepository = new UserRepository();
+
+const userService = new UserService(userRepository);
 
 const raupp = { nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35 };
 
 //Inicio dos testes
 
 //testes da aplicação
-describe('Testes da aplicaçao', function () {
-    // this.retries(5);
+describe('Testes unitários para service',  () => {
 
-    const loadDB = async function () {
-        const users = [ ...usersPredefined, raupp];
-        users.forEach( async (user) => {
-            return await chai.request(app)
-            .post(`${BASE_URL}/users`)
-            .send({ ...user });
-        });
+    const loadDB = async function (usersToLoad = usersPredefined) {
+        const users = [ ...usersToLoad];
+        await userRepository.loadDB(users);
     };
     
     const cleanup = async function () {
-        return await User.destroy({ truncate: true });
+        return await userRepository.loadDB([]);
     }
-    
-    before( async () => {
-        await sequelize.sync();  
-    });
-    
-    after('cleanup geral', () => {
-        server.close();
-    });
-    
- 
-    it('o servidor esta online', function (done) {
-        chai.request(app)
-        .get(`${BASE_URL}/`)
-        .end(function (err, res) {
-        expect(err).to.be.null;
-        expect(res).to.have.status(200);
-        done();
-        });
-    });
 
-    it('deveria ser uma lista vazia de usuarios', function (done) {
-        chai.request(app)
-        .get(`${BASE_URL}/users`)
-        .end(function (err, res) {
-        expect(err).to.be.null;
-        expect(res).to.have.status(200);
-        expect(res.body.rows).to.eql([]);
-        done();
-        });
+    it('deveria ser uma lista vazia de usuarios', async function () {
+        const users = await userService.findAll();
     });
 
     describe('Testes de criação de usuário', () => {
         after( async () => await cleanup() );
         
-        it('deveria criar o usuario raupp', function (done) {
-            chai.request(app)
-            .post(`${BASE_URL}/users`)
-            .send(raupp)
-            .end(function (err, res) {
-                expect(err).to.be.null;
-                expect(res).to.have.status(201);
-                done();
-            });
+        it('deveria criar o usuario raupp', async function () {
+            const user = await userService.save(raupp);
+            expect(user.nome).to.be.equal('raupp');
+            expect(user.idade).to.be.equal(35);
+            expect(user.email).to.be.equal("jose.raupp@devoz.com.br");
         });
         
-        it('cria usuários predefinidos', function (done) {
+        it('cria usuários predefinidos', async function () {
             const users = [ ...usersPredefined ];
-            users.forEach((user) => {
-                chai.request(app)
-                .post(`${BASE_URL}/users`)
-                .send({ ...user })
-                .end( (err, res) => {
-                    expect(err).to.be.null;
-                    expect(res).to.have.status(201);
-                });
+            users.forEach(async (user) => {
+                const userSaved = await userService.save(user);
+                expect(userSaved).to.be.jsonSchema(userSchema);
             });
-            done();
+            
         });
-        it('retorna status 400 para pedidos inválidos', (done) => {
-            chai.request(app)
-            .post(`${BASE_URL}/users`)
-            .send({nome: "raupp"})
-            .end(function (err, res) {
-                expect(res).to.have.status(400);
-                done();
-            });
+
+        it('retorna erro para pedidos inválidos', async () => {
+            const invalidUser = {nome: 'usuario invalido'};
+            try {
+                await userService.save(invalidUser);
+            } catch (err) {
+                expect(err).to.haveOwnProperty('type');
+                expect(err.type).to.be.equal('InvalidModelFieldsError');
+            }
         });
-        it('retorna campos invalidos para pedidos inválidos', (done) => {
-            chai.request(app)
-            .post(`${BASE_URL}/users`)
-            .send({nome: "raupp"})
-            .end(function (err, res) {
-                expect(res.body.message).to.be.equal('Bad Request: Invalid fields:\n' +
-                'notNull Violation: user.email cannot be null,' +
-                '\nnotNull Violation: user.idade cannot be null');
-                done();
-            });
+
+        it('retorna campos invalidos para pedidos inválidos', async () => {
+            const invalidUser = {nome: 'usuario invalido'};
+            try {
+                await userService.save(invalidUser);
+            } catch (err) {
+                expect(err).to.haveOwnProperty('invalidFields');
+                expect(err.invalidFields).to.be.equal('InvalidModelFieldsError');
+            }
         });
 
     });
@@ -131,15 +87,10 @@ describe('Testes da aplicaçao', function () {
             return await loadDB();
         });
         after( async () => await cleanup() );
-        it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
-            chai.request(app)
-            .get(`${BASE_URL}/users`)
-            .end(function (err, res) {
-            expect(err).to.be.null;
-            expect(res).to.have.status(200);
-            expect(res.body.total).to.be.at.least(5);
-            done();
-            });
+        it('deveria ser uma lista com pelo menos 5 usuarios', async function () {
+            const users = await userService.findAll();
+            expect(users).to.have.property(total);
+            expect(users.total).to.be.equal(5);
         });
         it('o usuario naoExiste não existe no sistema', function (done) {
             chai.request(app)

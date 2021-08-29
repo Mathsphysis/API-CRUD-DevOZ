@@ -85,4 +85,5 @@ async function userNotFoundErrGen(resourceName) {
     };
     return await errorFactory.getError(err, 'UserNotFoundError');
 }
+
 module.exports = SQLRepository;

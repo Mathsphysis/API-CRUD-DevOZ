@@ -38,6 +38,10 @@ const errorTypes = {
     InvalidOperationRequestedError(err) {
         const { name, op } = err;
         throw new InvalidOperationRequestedError(name, op);
+    },
+    UserAlreadyExistsError(err) {
+        const { name, nome } = err;
+        throw new UserAlreadyExistsError(name, nome);
     }
 }
 
