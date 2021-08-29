@@ -29,7 +29,8 @@ const raupp = { nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35 };
 //Inicio dos testes
 
 //testes da aplicação
-describe('Testes da aplicaçao',  () => {
+describe('Testes da aplicaçao', function () {
+    this.retries(5);
 
     const loadDB = async function () {
         const users = [ ...usersPredefined, raupp];
