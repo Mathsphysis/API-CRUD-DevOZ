@@ -19,22 +19,20 @@ router.get("/", async (ctx) => {
 });
 
 router.get("/users", async (ctx) => {
-  const { page, limit } = ctx.request.query;
-  if(!page) {
-    try {
-      const users = await userService.findAll();
-      ctx.status = 200;
-      ctx.body = { total: users.length, count: users.length, rows: users };
-    } catch (err) {
-      ctx.throw(500);
-    }
-  }
-  const limit = limit ? parseInt(limit) : 10;
-  const page = parseInt(page);
+  let { page, limit } = ctx.request.query;
+  limit = limit ? parseInt(limit) : 10;
+  page = page ? parseInt(page) : 1;
+
   try {
-    const users = await userService.findWithPagination(page, limit);
+    const usersPage = await userService.findAll(page, limit);
     ctx.status = 200;
-    ctx.body = { total: users.count, count: users.length, rows: users.rows, totalPages: users.totalPage, currentPage: users.currentPage };
+    ctx.body = { 
+      total: usersPage.count, 
+      currentPageUsersCount: usersPage.rows.length, 
+      rows: usersPage.rows, 
+      totalPages: usersPage.totalPages, 
+      currentPage: usersPage.currentPage 
+    };
   } catch (err) {
     ctx.throw(500);
   }

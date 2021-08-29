@@ -4,29 +4,15 @@ const errorFactory = new ErrorFactory();
 
 function UserService(userRepository) {
 
- async function findAll () {
-    try{
-        return await userRepository.findAll();
-    } catch (err) {
-        throw err;
-    }
-};
-
-async function findWithPagination(page, limit) {
-    if(page === NaN){
-        const err = {
-            name: 'Invalid Page Value Error',
-            field: `Page contains an invalid value`,
-            type: 'InvalidPageValueError'
-        };
-        return await errorFactory.getError(err);
-    }
-    const totalPages = Math.ceil(users.count / limit);
+ async function findAll (page, limit) {
     const offset = (page - 1) * limit;
-    const users = await userRepository.findWithOffsetAndLimit(offset, limit);
+    const users = await userRepository.findAll(offset, limit);
+
+    const totalPages = Math.ceil(users.count / limit);
     users.totalPages = totalPages;
     users.currentPage = page;
-}
+    return users;
+};
 
  async function findOneByName(name) {
   try {
@@ -80,7 +66,6 @@ async function findWithPagination(page, limit) {
 return {
     save,
     findAll,
-    findWithPagination,
     findOneByName,
     deleteByName,
     updateByName,
