@@ -44,14 +44,15 @@ before( async () => {
     await sequelize.sync();  
 });
 
+after('cleanup geral', () => {
+    server.close();
+});
+
 //Inicio dos testes
 
 //testes da aplicação
 describe('Testes da aplicaçao',  () => {
-
-    after('cleanup', () => {
-        server.close();
-    });
+ 
     it('o servidor esta online', function (done) {
         chai.request(app)
         .get(`${BASE_URL}/`)
