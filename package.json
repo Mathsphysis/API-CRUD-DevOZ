@@ -22,6 +22,7 @@
   "homepage": "https://github.com/Mathsphysis/API-CRUD-DevOZ/tree/main#readme",
   "dependencies": {
     "config": "^3.3.6",
+    "dotenv": "^10.0.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^9.4.0",
