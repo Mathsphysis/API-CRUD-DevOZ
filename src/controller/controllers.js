@@ -20,7 +20,8 @@ let router = new Router({
 
 //rota simples pra testar se o servidor está online
 router.get("/", async (ctx) => {
-  ctx.body = `O servidor está rodando!`;
+  const healthCheck = { message: `O servidor está rodando!` };
+  ctx.body = healthCheck;
 });
 
 router.get("/users", async (ctx) => {

@@ -60,6 +60,7 @@ describe('Testes da aplicaçao', function () {
         .end(function (err, res) {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
+        expect(res.body.message).to.be.equal('O servidor está rodando!');
         done();
         });
     });
