@@ -1,0 +1,342 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Mathsphysis/DevOz-Test-API/v1
+info:
+  description: This is an API for testing basic knowledge of coop for DevOz test.
+  version: "v1"
+  title: Simple User API
+  contact:
+    email: smathsphysis@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: consumers
+    description: Operations available to regular consumers
+paths:
+  /:
+    get:
+      tags:
+        - consumers
+      summary: health check
+      operationId: healthCheck
+      description: Checks if the server is alive and responding requests
+      responses:
+        '200':
+          description: Server is running and responding requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+              examples:
+                userExample1:
+                  $ref: '#/components/examples/HealthCheck'
+  /users:
+    get:
+      tags:
+        - consumers
+      summary: get page with user entries
+      operationId: findAllWithPagination
+      description: By passing the appropriate options, you can choose current page and
+        maximum records per page
+      parameters:
+        - in: query
+          name: page
+          description: number of current page
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+        - in: query
+          name: limit
+          description: maximum number of records to return per page
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 50
+      responses:
+        '200':
+          description: page containing found users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+              examples:
+                userExample1:
+                  $ref: '#/components/examples/users'
+              
+        '400':
+          description: bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                queryPageError:
+                  $ref: '#/components/examples/QueryPageError'
+                queryLimitError:
+                  $ref: '#/components/examples/QueryLimitError'
+    post:
+      tags:
+        - consumers
+      summary: creates a new user
+      operationId: saveUser
+      description: |
+        By passing an compliant user object, you can create a new user on the database.
+        UNEXPECTED BEHAVIOR! -> The application can behave unexpectedly if there is an user with the same name.
+      requestBody:
+        description: User to be created in the database
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            examples:
+              user:
+                $ref: '#/components/examples/user'
+      responses:
+        '204':
+          description: sucessfully updated the user
+        '400':
+          description: bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidFields:
+                  $ref: '#/components/examples/InvalidFieldsError'
+  /users/{id}:
+    get:
+      tags:
+        - consumers
+      summary: get the user with name specified in id
+      operationId: findOneUser
+      description: |
+        By passing in the appropriate options, you can search for
+        available inventory in the system
+      parameters:
+        - in: path
+          name: id
+          description: Name of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/User'
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - consumers
+      summary: update the user with the requested value
+      operationId: updateUser
+      description: |
+        By passing in the appropriate options, you can search for
+        available inventory in the system
+      parameters:
+        - in: path
+          name: id
+          description: Name of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: sucessfully updated the user
+        '400':
+          description: bad input parameter
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                UserNotFound:
+                  $ref: '#/components/examples/UserNotFoundError'
+    patch:
+      tags:
+        - consumers
+      summary: update the user field with the requested value
+      operationId: replaceUserField
+      description: |
+        By passing in the appropriate options, you can search for
+        available inventory in the system
+      parameters:
+        - in: path
+          name: id
+          description: Name of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: sucessfully updated the user
+        '400':
+          description: bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                InvalidFieldError:
+                  $ref: '#/components/examples/InvalidFieldError'
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                UserNotFound:
+                  $ref: '#/components/examples/UserNotFoundError'
+    delete:
+      tags:
+        - consumers
+      summary: deletes the user
+      operationId: deleteUser
+      description: |
+        By passing in the user name, you can delete it from the system
+      parameters:
+        - in: path
+          name: id
+          description: Name of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: sucessfully updated the user
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                UserNotFound:
+                  $ref: '#/components/examples/UserNotFoundError'
+components:
+  schemas:
+    Users:
+      type: object
+      required:
+        - currentPage
+        - currentPageEntriesCount
+        - total
+        - rows
+        - totalPages
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+          example: 3
+        currentPage:
+          type: integer
+          format: int32
+          example: 3
+        currentPageEntriesCount:
+          type: integer
+          format: int32
+          example: 1
+        total:
+          type: integer
+          format: int32
+          example: 5
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    User:
+      type: object
+      required:
+        - nome
+        - idade
+        - email
+      properties:
+        nome:
+          type: string
+          pattern: /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/
+          example: Maths Physis
+        idade:
+          type: integer
+          format: int32
+          example: 28
+        email:
+          type: string
+          pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          example: 'mathsphysis@mail.com'
+    Error:
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Not Found: User with WHERE name='naoExiste' not found"
+    HealthCheck:
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "O servidor está rodando!"
+  examples:
+    users:
+      summary: Example of pagination
+      value:
+        total: 5
+        currentPage: 2
+        totalPages: 3
+        currentPageEntriesCount: 2
+        rows:
+          - nome: Fernanda Lima
+            idade: 30
+            email: fernandaLima@mail.com
+          - nome: marcelo
+            idade: 23
+            email: marcelo@mail.com
+    user:
+      summary: Simple example of an user
+      value:
+        nome: Maths Physis
+        idade: 20
+        email: 'mathsphys@mail.com'
+    QueryPageError:
+      summary: Example of query page error
+      value:
+        message: 'Bad Request: Invalid query page value: paginaInvalida'
+    QueryLimitError:
+      summary: Example of query limit error
+      value:
+        message: 'Bad Request: Invalid query limit value: limiteInvalido'
+    UserNotFoundError:
+      summary: Example of user not found error
+      value:
+        message: "Not Found: User with WHERE name='naoExiste' not found"
+    InvalidFieldsError:
+      summary: Example of invalid fields in user object error
+      value:
+        message: 'Bad Request: Invalid fields:\nnotNull Violation: user.email cannot be null,\nnotNull Violation: user.idade cannot be null'
+    InvalidFieldError:
+      summary: Example of invalid field in patch error
+      value:
+        message: 'Bad Request: Invalid fields:\nnotNull Violation: user.email cannot be null'
+    HealthCheck:
+      summary: Server health check
+      value:
+        message: 'O servidor está rodando!'
