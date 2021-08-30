@@ -5,6 +5,12 @@
 //https://github.com/ZijianHe/koa-router
 
 // todas as configuraçoes devem ser passadas via environment variables
+if(process.env.NODE_ENV){
+  require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` })
+} else {
+  require('dotenv').config();
+}
+
 const PORT = process.env.PORT || 3000;
 
 const Koa = require('koa');

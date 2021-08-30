@@ -1,11 +1,14 @@
 const Router = require("koa-router");
-const config = require('config');
-
-const repoConfig = config.get('repository');
 
 const UserService = require('../service/service');
 const ErrorFactory = require("../exception/ErrorFactory");
-const UserRepository = require(`../repository/${repoConfig.name}`);
+
+const repo = process.env.REPO;
+
+const UserRepository = require(`../repository/${repo}`);
+
+
+
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
