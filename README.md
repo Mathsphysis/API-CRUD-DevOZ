@@ -20,3 +20,4 @@ E em seguida rodar:
 ````
 npm test
 ````
+PS: Sometimes the integration test fails, try a few more times and they should pass.
