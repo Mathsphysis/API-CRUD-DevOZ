@@ -11,8 +11,5 @@
           "idle": 10000
         }
       }
-    },
-    "repository": {
-      "name": "sqlRepository"
     }
-  }
+}
