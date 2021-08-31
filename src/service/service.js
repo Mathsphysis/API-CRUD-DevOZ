@@ -2,27 +2,15 @@ const ErrorFactory = require("../exception/ErrorFactory");
 
 const errorFactory = new ErrorFactory();
 
+const DEFAULT_PAGE_ENTRIES_LIMIT = 10;
+
+const DEFAULT_CURRENT_PAGE = 1;
+
 function UserService(userRepository) {
 
  async function findAll (queryPage, queryLimit) {
     try {
-        let limit = 10;
-        let page = 1;
-        if(queryLimit !== undefined) {
-            limit = parseInt(queryLimit);
-        }
-        if(queryPage !== undefined) {
-            page = parseInt(queryPage);
-        }
-
-        if(isNaN(page) || page < 1) {
-            return await invalidPageValueErrGen(queryPage); 
-        }
-        if(isNaN(limit) || limit < 1) {
-            return await invalidPaginationLimitValueErrGen(queryLimit); 
-        }
-
-        const offset = (page - 1) * limit;
+        const {offset, limit } = pagination(queryPage, queryLimit);
         let users = await userRepository.findAll(offset, limit);
     
         const totalPages = Math.ceil(users.count / limit);
@@ -100,6 +88,28 @@ const validFields = {
     nome: 'nome',
     email: 'email',
     idade: 'idade'
+}
+
+async function pagination(queryPage, queryLimit) {
+    let limit = DEFAULT_PAGE_ENTRIES_LIMIT;
+    let page = DEFAULT_CURRENT_PAGE;
+    if(queryLimit !== undefined) {
+        limit = parseInt(queryLimit);
+    }
+    if(queryPage !== undefined) {
+        page = parseInt(queryPage);
+    }
+
+    if(isNaN(page) || page < 1) {
+        return await invalidPageValueErrGen(queryPage); 
+    }
+    if(isNaN(limit) || limit < 1) {
+        return await invalidPaginationLimitValueErrGen(queryLimit); 
+    }
+
+    const offset = (page - 1) * limit;
+    const paginationProperties = { offset, limit };
+    return paginationProperties;
 }
 
 async function invalidPageValueErrGen(page){
